@@ -6,7 +6,7 @@ export const getAllAccounts = (req: Request, res: Response) => {
 };
 
 export const getAccountById = (req: Request, res: Response) => {
-  const account = accounts.find((acc) => acc.accountNumber === req.params.id);
+  const account = accounts.find((acc) => acc.id === req.params.id);
   if (!account) {
     return res.status(404).json({ error: "Account not found" });
   }

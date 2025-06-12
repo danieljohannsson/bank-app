@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { XMLParser } from "fast-xml-parser";
-import { AccountInfo, Transaction, Camt053Data } from "./types";
+import { AccountInfo, Transaction } from "./types";
 
 const xmlData = readFileSync("camt053.xml", "utf-8");
 const parser = new XMLParser({
@@ -18,10 +18,10 @@ export const accounts: AccountInfo[] = (
     (bal: any) => bal.Tp?.CdOrPrtry?.Cd === "CLBD"
   );
   return {
-    accountNumber: ntry.Id.Othr.Id,
+    id: String(ntry.Id.Othr.Id),
     currency: ntry.Ccy,
     ownerName: ntry.Ownr.Nm,
-    balance: clbdBalance?.CdtLine?.Amt["#text"] ?? "0",
+    balance: String(clbdBalance?.CdtLine?.Amt["#text"]) ?? "0",
   };
 });
 
@@ -65,10 +65,6 @@ export const transactions: Transaction[] = (
   };
 });
 
-export const camtData: Camt053Data = {
-  accounts,
-  transactions,
-};
-
-console.log(JSON.stringify(camtData, null, 2));
+console.log(JSON.stringify(transactions, null, 2));
+console.log(JSON.stringify(accounts, null, 2));
 console.log(statement.Ntry[0].NtryDtls.TxDtls[0].RmtInf.Strd);
