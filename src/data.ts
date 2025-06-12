@@ -35,33 +35,38 @@ export const transactions: Transaction[] = (
     amount: ntry.Amt["#text"],
     currency: ntry.Amt["@_Ccy"],
     remittanceInfo: Array.isArray(details)
-      ? details
-          .map((dtls: any) => {
-            const strd = dtls.RmtInf?.Strd;
-            if (strd) {
-              const rmtdAmt = strd.RfrdDocAmt?.RmtdAmt;
-              const cdtrRef = strd.CdtrRefInf?.Ref;
-              const cd = strd.RfrdDocInf?.Tp?.CdOrPrtry?.Cd;
-              const nbr = strd.RfrdDocInf?.Nb;
-              let referredDocInfo = "";
-              if (cd || nbr) {
-                referredDocInfo = `RefDocInfo: ${cd} ${nbr}`;
-              }
-              return `Amount: ${rmtdAmt?.["#text"] ?? "N/A"} ${
-                rmtdAmt?.["@_Ccy"] ?? ""
-              }, Ref: ${cdtrRef ?? "N/A"} ${referredDocInfo}`;
-            }
-            return "no-info";
-          })
-          .join(", ")
+      ? details.map((dtls: any) => {
+          const strd = dtls.RmtInf?.Strd;
+          if (strd) {
+            const rmtdAmt = strd.RfrdDocAmt?.RmtdAmt;
+            const cdtrRef = strd.CdtrRefInf?.Ref;
+            const cd = strd.RfrdDocInf?.Tp?.CdOrPrtry?.Cd;
+            const nbr = strd.RfrdDocInf?.Nb;
+            return {
+              amount: rmtdAmt?.["#text"] ?? null,
+              currency: rmtdAmt?.["@_Ccy"] ?? null,
+              creditorReference: cdtrRef ?? null,
+              referredDocInfo: {
+                code: cd ?? null,
+                number: nbr ?? null,
+              },
+            };
+          }
+          return { info: "no-info" };
+        })
       : details.RmtInf?.Strd
-      ? `Amount: ${
-          details.RmtInf.Strd.RfrdDocAmt?.RmtdAmt?.["#text"] ?? "N/A"
-        } ${details.RmtInf.Strd.RfrdDocAmt?.RmtdAmt?.["@_Ccy"] ?? ""}, Ref: ${
-          details.RmtInf.Strd.CdtrRefInf?.Ref ?? "N/A"
-        }`
-      : "no-info",
-    uniqueId: ntry.AcctSvcrRef ?? "no-id",
+      ? {
+          amount: details.RmtInf.Strd.RfrdDocAmt?.RmtdAmt?.["#text"] ?? null,
+          currency: details.RmtInf.Strd.RfrdDocAmt?.RmtdAmt?.["@_Ccy"] ?? null,
+          creditorReference: details.RmtInf.Strd.CdtrRefInf?.Ref ?? null,
+          referredDocInfo: {
+            code: details.RmtInf.Strd.RfrdDocInf?.Tp?.CdOrPrtry?.Cd ?? null,
+            number: details.RmtInf.Strd.RfrdDocInf?.Nb ?? null,
+          },
+        }
+      : details.RmtInf?.Ustrd
+      ? { unstructured: details.RmtInf?.Ustrd }
+      : { info: "no-info" },
   };
 });
 
