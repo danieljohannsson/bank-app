@@ -1,5 +1,5 @@
 export type AccountInfo = {
-  accountNumber: string;
+  id: string;
   currency: string;
   ownerName: string;
   balance: string;
@@ -13,7 +13,8 @@ export type Transaction = {
   uniqueId: string;
 };
 
-export type Camt053Data = {
-  accounts: AccountInfo[];
-  transactions: Transaction[];
+export type User = {
+  id: string;
+  username: string;
+  passwordHash: string;
 };
